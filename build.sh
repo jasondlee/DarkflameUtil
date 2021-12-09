@@ -29,7 +29,7 @@ flush privileges;
 EOF
 
 # Install required deps. Not nearly complete yet.
-sudo dnf install zlib-devel unrar
+sudo dnf install -y zlib-devel rar unrar gcc gcc-c++ make cmake python3 python3-pip sqlite wget git unzip
 if [ ! -e $BASE/LEGO\ Universe\ \(unpacked\).rar ] ; then
     echo Downloading client
     wget https://archive.org/download/lego-universe-unpacked/LEGO%20Universe%20%28unpacked%29.rar
@@ -78,6 +78,7 @@ for INI in authconfig.ini  chatconfig.ini  masterconfig.ini  worldconfig.ini ; d
     sed -i "s/mysql_database=.*/mysql_database=$MYSQL_DB/" $INI
     sed -i "s/mysql_username=.*/mysql_username=$MYSQL_USER/" $INI
     sed -i "s/mysql_password=.*/mysql_password=$MYSQL_PASS/" $INI
+    sed -i "s/external_ip=.*/external_ip=$SERVER_HOST/" $INI
 done
 pause
 
@@ -118,6 +119,17 @@ PRIVACY_POLICY = 'policy/Privacy Policy.pdf'
 
 # Path to the terms of use users have to agree to
 TERMS_OF_USE = 'policy/Terms of Use.pdf'" > resources.py
+
+if [ ! -e dlu_client.zip ] ; then
+    echo Configuration client
+    mkdir dlu_client
+    cd dlu_client
+    unrar e $BASE/LEGO\ Universe\ \(unpacked\).rar 
+    sed -i "s/AUTHSERVERIP=0:.*/AUTHSERVERIP=0:$SERVER_HOST/" boot.cfg
+    cd $BASE
+    zip -r -9 dlu_client.zip dlu_client/*
+    rm -rf dlu_client
+fi
 
 echo Build finished.
 echo The server is available in $SERVER/build/MasterServer
