@@ -19,6 +19,7 @@ AM=$BASE/AccountManager
 # MYSQL_USER=lego
 # MYSQL_PASS=legouniverse
 
+echo "Create MySQL/MariaDB database. Enter 'root' password for database..."
 mysql -u root -p -h $MYSQL_HOST <<EOF
 drop database if exists $MYSQL_DB;
 drop user if exists '$MYSQL_USER'@'$MYSQL_HOST';
@@ -29,7 +30,7 @@ flush privileges;
 EOF
 
 # Install required deps. Not nearly complete yet.
-sudo dnf install -y zlib-devel rar unrar gcc gcc-c++ make cmake python3 python3-pip sqlite wget git unzip
+sudo dnf install -y zlib-devel unrar gcc gcc-c++ make cmake python3 python3-pip sqlite wget git unzip
 if [ ! -e $BASE/LEGO\ Universe\ \(unpacked\).rar ] ; then
     echo Downloading client
     wget https://archive.org/download/lego-universe-unpacked/LEGO%20Universe%20%28unpacked%29.rar
@@ -124,7 +125,7 @@ if [ ! -e dlu_client.zip ] ; then
     echo Configuration client
     mkdir dlu_client
     cd dlu_client
-    unrar e $BASE/LEGO\ Universe\ \(unpacked\).rar 
+    unrar x $BASE/LEGO\ Universe\ \(unpacked\).rar 
     sed -i "s/AUTHSERVERIP=0:.*/AUTHSERVERIP=0:$SERVER_HOST/" boot.cfg
     cd $BASE
     zip -r -9 dlu_client.zip dlu_client/*
