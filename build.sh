@@ -126,7 +126,7 @@ if [ ! -e dlu_client.zip ] ; then
     echo Configuring client
     mkdir $BASE/dlu_client
     cd $BASE/dlu_client
-    echo Extracing client
+    echo Extracting client
     unrar x $BASE/LEGO\ Universe\ \(unpacked\).rar > /dev/null
     sed -i "s/AUTHSERVERIP=0:.*/AUTHSERVERIP=0:$SERVER_HOST/" boot.cfg
     cd $BASE
