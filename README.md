@@ -1,6 +1,6 @@
-== DarkflameServer Util
+# DarkflameServer Util
 
-The DarkflameServer is a recreation of long-discontinued LEGO Universe MMO, and is a truly impressive work. What this ulitity will do is make the installation of a server much simpler, and mostly hands-off.
+The [DarkflameServer](https://github.com/DarkflameUniverse/DarkflameServer) is a recreation of long-discontinued LEGO Universe MMO, and is a truly impressive work. What this ulitity will do is make the installation of a server much simpler, and mostly hands-off.
 
 Specifically, this script will:
 
