@@ -6,18 +6,9 @@ read -p "MySQL Database: " MYSQL_DB
 read -p "MySQL User: " MYSQL_USER
 read -p "MySQL Password: " MYSQL_PASS
 
-function pause() {
-    echo 'read -p "Press enter..."'
-}
-
 BASE=`pwd`
 SERVER=$BASE/DarkflameServer
 AM=$BASE/AccountManager
-
-# MYSQL_HOST=localhost
-# MYSQL_DB=lego
-# MYSQL_USER=lego
-# MYSQL_PASS=legouniverse
 
 echo "Create MySQL/MariaDB database. Enter 'root' password for database..."
 mysql -u root -p -h $MYSQL_HOST <<EOF
@@ -29,7 +20,11 @@ grant all on $MYSQL_DB.* to '$MYSQL_USER'@'$MYSQL_HOST';
 flush privileges;
 EOF
 
+echo Updating MySQL/MariaDB database
+mysql --user=$MYSQL_USER --password=$MYSQL_PASS -h $MYSQL_HOST $MYSQL_DB < $SERVER/migrations/dlu/0_initial.sql
+
 # Install required deps. Not nearly complete yet.
+echo Installing required deps, if needed
 sudo dnf install -y zlib-devel unrar gcc gcc-c++ make cmake python3 python3-pip sqlite wget git unzip
 if [ ! -e $BASE/LEGO\ Universe\ \(unpacked\).rar ] ; then
     echo Downloading client
@@ -54,13 +49,11 @@ mkdir -p build/logs build/res
 cd build
 cmake ..
 make
-pause
 
 echo Extracting resources from client archive
 unrar -inul -y x $BASE/LEGO\ Universe\ \(unpacked\).rar res/macros res/BrickModels res/chatplus_en_us.txt res/names res/maps locale/locale.xml res/cdclient.fdb
 cd res
 unzip -q $BASE/navmeshes.zip
-pause
 
 echo Converstion database
 python3 $BASE/utils/utils/fdb_to_sqlite.py --sqlite_path CDServer.sqlite cdclient.fdb
@@ -70,7 +63,6 @@ for SQL in  $SERVER/migrations/cdserver/0_nt_footrace.sql \
     $SERVER/migrations/cdserver/2_script_component.sql ; do
     sqlite3 $SERVER/build/res/CDServer.sqlite < $SQL
 done
-pause
 
 echo Applying database configuration
 cd $SERVER/build
@@ -81,11 +73,6 @@ for INI in authconfig.ini  chatconfig.ini  masterconfig.ini  worldconfig.ini ; d
     sed -i "s/mysql_password=.*/mysql_password=$MYSQL_PASS/" $INI
     sed -i "s/external_ip=.*/external_ip=$SERVER_HOST/" $INI
 done
-pause
-
-echo Updating MySQL/MariaDB database
-mysql --user=$MYSQL_USER --password=$MYSQL_PASS -h $MYSQL_HOST $MYSQL_DB < $SERVER/migrations/dlu/0_initial.sql
-pause
 
 echo Creating admin user
 cd $SERVER/build
