@@ -7,7 +7,8 @@ read -p "MySQL User: " MYSQL_USER
 read -p "MySQL Password: " MYSQL_PASS
 
 function pause() {
-    read -p "Press enter..."
+    echo 
+    #'read -p "Press enter..."'
 }
 
 BASE=`pwd`
@@ -50,16 +51,16 @@ git clone https://github.com/DarkflameUniverse/AccountManager.git
 
 echo "Building server..."
 cd $BASE/DarkflameServer
-mkdir build 
+mkdir -p build/logs build/res
 cd build
 cmake ..
 make
 pause
 
 echo Extracting resources from client archive
-unrar x $BASE/LEGO\ Universe\ \(unpacked\).rar res/macros res/BrickModels res/chatplus_en_us.txt res/names res/maps locale/locale.xml res/cdclient.fdb
+unrar -inul -y x $BASE/LEGO\ Universe\ \(unpacked\).rar res/macros res/BrickModels res/chatplus_en_us.txt res/names res/maps locale/locale.xml res/cdclient.fdb
 cd res
-unzip $BASE/navmeshes.zip
+unzip -q $BASE/navmeshes.zip
 pause
 
 echo Converstion database
@@ -121,14 +122,17 @@ PRIVACY_POLICY = 'policy/Privacy Policy.pdf'
 # Path to the terms of use users have to agree to
 TERMS_OF_USE = 'policy/Terms of Use.pdf'" > resources.py
 
+cd $BASE
 if [ ! -e dlu_client.zip ] ; then
-    echo Configuration client
-    mkdir dlu_client
-    cd dlu_client
-    unrar x $BASE/LEGO\ Universe\ \(unpacked\).rar 
+    echo Configuring client
+    mkdir $BASE/dlu_client
+    cd $BASE/dlu_client
+    echo Extracting client
+    unrar x $BASE/LEGO\ Universe\ \(unpacked\).rar > /dev/null
     sed -i "s/AUTHSERVERIP=0:.*/AUTHSERVERIP=0:$SERVER_HOST/" boot.cfg
     cd $BASE
-    zip -r -9 dlu_client.zip dlu_client/*
+    echo Repackaging client
+    zip -r -q dlu_client.zip dlu_client/*
     rm -rf dlu_client
 fi
 
